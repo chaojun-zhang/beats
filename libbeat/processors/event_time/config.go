@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package eventtime
+package event_time
 
 type config struct {
 	ID           string `config:"id"` // An identifier for this processor. Useful for debugging.

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package eventtime
+package event_time
 
 import (
 	"testing"

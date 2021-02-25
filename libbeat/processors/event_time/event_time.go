@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package eventtime
+package event_time
 
 import (
 	"encoding/json"
@@ -36,8 +36,8 @@ import (
 const logName = "processor.eventtime"
 
 func init() {
-	processors.RegisterPlugin("eventtime", New)
-	jsprocessor.RegisterPlugin("eventtime", New)
+	processors.RegisterPlugin("event_time", New)
+	jsprocessor.RegisterPlugin("event_time", New)
 }
 
 type processor struct {

@@ -15,25 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+package flume_event
 
-import (
-	"os"
-	_ "github.com/raboof/beats-output-http/http"
-	"github.com/elastic/beats/v7/filebeat/cmd"
-	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
-)
+type config struct {
+	EventTimeField string `config:"event_time_field"`
+	ID             string `config:"id"`
+}
 
-// The basic model of execution:
-// - input: finds files in paths/globs to harvest, starts harvesters
-// - harvester: reads a file, sends events to the spooler
-// - spooler: buffers events until ready to flush to the publisher
-// - publisher: writes to the network, notifies registrar
-// - registrar: records positions of files read
-// Finally, input uses the registrar information, on restart, to
-// determine where in each file to restart a harvester.
-func main() {
-	if err := cmd.Filebeat(inputs.Init, cmd.FilebeatSettings()).Execute(); err != nil {
-		os.Exit(1)
+func defaultConfig() config {
+	return config{
+		EventTimeField: "@event_time",
 	}
 }

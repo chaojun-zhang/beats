@@ -59,6 +59,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func newFromConfig(c config) (*processor, error) {
+
 	loc, err := loadLocation(c.Timezone)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load timezone")
@@ -73,6 +74,7 @@ func newFromConfig(c config) (*processor, error) {
 	if c.ID != "" {
 		p.log = p.log.With("instance_id", c.ID)
 	}
+	p.log.Info("event-time processor loaded")
 
 	return p, nil
 }

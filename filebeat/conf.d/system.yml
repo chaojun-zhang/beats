@@ -1,0 +1,16 @@
+- type: log
+  # Change to true to enable this input configuration.
+  enabled: true
+  # Paths that should be crawled and fetched. Glob based paths.
+  paths:
+    - /Users/chaojun/log/nginx.log
+  fields:
+    topic: "nginx"
+    idc: "idc"
+  processors:
+    - event-time:
+        time_layout: '2006-01-02T15:04:05Z'
+        message_format: 'CSV'
+        time_start_pos: 1
+        csv_delimiter: '|#|'
+        csv_field_pos: 2

@@ -41,7 +41,7 @@ func newFromConfig(c config) (processors.Processor, error) {
 	if c.ID != "" {
 		p.log = p.log.With("instance_id", c.ID)
 	}
-
+	p.log.Info("flume-event processor loaded")
 	return p, nil
 }
 
@@ -52,10 +52,9 @@ func (p *processor) String() string {
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 	fields, err := event.GetValue("fields")
-	if err != nil {
-		return event, errors.Wrap(err, "field 'fields' not exist")
+	if err == nil {
+		event.PutValue("headers", fields)
 	}
-	event.PutValue("headers", fields)
 
 	body, err := event.GetValue("message")
 	if err != nil {

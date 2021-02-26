@@ -20,7 +20,7 @@ package event_time
 type config struct {
 	ID           string `config:"id"` // An identifier for this processor. Useful for debugging.
 	TargetField  string `config:"target_field"`
-	LogFormat    string `config:"log_format"`                      // log format e.g. (json,csv,text)
+	MessageFormat    string `config:"log_format"`                      // log format e.g. (json,csv,text)
 	Timezone     string `config:"timezone"`                        // Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone.
 	TimeLayout   string `config:"time_layout" validate:"required"` // Timestamp layouts that define the expected time value format.
 	TimeFormat   string `config:"time_format" validate:"required"` // time format .e.g. (date,unix,unix_ms,local)
@@ -28,13 +28,15 @@ type config struct {
 	CsvDelimiter string `config:"csv_delimiter"`                   //csv delimiter
 	CsvFieldPos  int    `config:"csv_field_pos"`
 	JsonField    string `config:"json_field"`
+	IgnoreFailure bool   `config:"json_field"`                     // Ignore errors when parsing the timestamp.
+	IgnoreMissing bool   `config:"json_field"`                     // Ignore errors when the source field is missing.
 }
 
 func defaultConfig() config {
 	return config{
-		TargetField:  "@event_time",
-		TimeFormat:   "date",
-		LogFormat:    "text",
-		CsvDelimiter: ",",
+		TargetField:   "@event_time",
+		TimeFormat:    "DATE",
+		MessageFormat: "TEXT",
+		CsvDelimiter:   ",",
 	}
 }

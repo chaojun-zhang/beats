@@ -43,7 +43,7 @@ func TestParsePatternsForCsv(t *testing.T) {
 	evt := &beat.Event{Fields: common.MapStr{}}
 
 	t.Run("date", func(t *testing.T) {
-		p.LogFormat = "csv"
+		p.MessageFormat = "CSV"
 		p.TimeFormat = "date"
 		p.TimeStartPos = 1
 		p.TimeLayout = "02/Jan/2006:15:04:05 -0700"
@@ -63,7 +63,7 @@ func TestParsePatternsForCsv(t *testing.T) {
 	})
 
 	t.Run("UNIX", func(t *testing.T) {
-		p.LogFormat = "csv"
+		p.MessageFormat = "CSV"
 		p.TimeFormat = "UNIX"
 		p.TimeStartPos = 1
 		p.TimeLayout = "1611560692"

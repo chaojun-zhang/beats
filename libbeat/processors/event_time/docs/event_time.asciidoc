@@ -1,0 +1,76 @@
+[[processor-event-time]]
+=== EventTime
+
+++++
+<titleabbrev>event-time</titleabbrev>
+++++
+
+beta[]
+
+The `event-time` processor parses a timestamp from a message field. By default the
+event-time processor writes the parsed result to the `@event_time` field. You can
+specify a different field by setting the `target_field` parameter. The timestamp
+value is parsed according to the `layouts` parameter. Layout can be
+specified and they will be used sequentially to attempt parsing the timestamp
+field.
+
+NOTE: The timestamp layout used by this processor is different than the
+      formats supported by date processors in Logstash and Elasticsearch Ingest
+      Node.
+
+The `time_layout` are described using a reference time that is based on this
+specific time:
+
+    Mon Jan 2 15:04:05 MST 2006
+
+Since MST is GMT-0700, the reference time is:
+
+    01/02 03:04:05PM '06 -0700
+
+To define your own layout, rewrite the reference time in a format that matches
+the timestamps you expect to parse. For more layout examples and details see the
+https://godoc.org/time#pkg-constants[Go time package documentation].
+
+If a layout does not contain a year then the current year in the specified
+`timezone` is added to the time value.
+
+.EventTime options
+[options="header"]
+|======
+| Name             | Required | Default    | Description                                                                                                           |
+| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.                                    |
+| `time_layout`    | yes      |            | Timestamp layout that define the expected time value format. In addition layouts, unix timestamp are accepted.        |
+| `timezone`       | no       | UTC        | Time zone (e.g. America/New_York) to use when parsing a timestamp not containing a time zone.                         |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                                                       |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                                          |
+| `time_format`    | no       | DATE       | Time format for the parsed time value. The value can be 'DATE','UNIX','UNIX_MS','LOCAL',default value is 'DATE'                             |
+| `message_format` | no       | TEXT       | Text Format of message field.  The value can be 'CSV','TEXT','JSON',default value is 'TEXT'
+| `message_format` | no       | TEXT       | Text Format of message field.  The value can be 'CSV','TEXT','JSON',default value is 'TEXT'
+| `time_start_pos` | no       | 0          | start position of the time
+| `csv_field_pos`  | no       | 0          | field position of time field in message with csv format.
+| `csv_delimiter`  | no       | ,          | delimiter of csv field
+| `json_field`     | no       |            | field name of time field in message with json  format
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                                                      |
+|======
+
+Below are examples that parses the `message` field and writes the result
+to the `@event_time` field.
+
+[source,yaml]
+----
+processors:
+  - event-time:
+      time_layout: '2006-01-02T15:04:05Z'
+  - event-time:
+      time_layout: '2006-01-02T15:04:05Z'
+      message_format: 'CSV'
+      time_start_pos: 1
+      csv_delimiter: '|#|'
+      csv_field_pos: 2
+  - event-time
+      time_layout: '2006-01-02T15:04:05Z'
+      message_format: 'CSV'
+      time_start_pos: 1
+      csv_delimiter: '|#|'
+      csv_field_pos: 2
+----

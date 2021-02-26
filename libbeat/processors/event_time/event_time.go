@@ -33,11 +33,11 @@ import (
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
-const logName = "processor.eventtime"
+const logName = "processor.event-time"
 
 func init() {
-	processors.RegisterPlugin("event_time", New)
-	jsprocessor.RegisterPlugin("event_time", New)
+	processors.RegisterPlugin("event-time", New)
+	jsprocessor.RegisterPlugin("event-time", New)
 }
 
 type processor struct {
@@ -52,7 +52,7 @@ type processor struct {
 func New(cfg *common.Config) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, errors.Wrap(err, "failed to unpack the timestamp configuration")
+		return nil, errors.Wrap(err, "failed to unpack the event_time configuration")
 	}
 
 	return newFromConfig(c)
@@ -93,25 +93,34 @@ func loadLocation(timezone string) (*time.Location, error) {
 }
 
 func (p *processor) String() string {
-	return fmt.Sprintf("timestamp=[timezone=%v, layout=%v]", p.tz, p.TimeLayout)
+	return fmt.Sprintf("timestamp=[timezone=%v, time_layout=%v, time_format=%v, message_format=%v, target_field=%v]", p.tz, p.TimeLayout, p.TimeFormat, p.MessageFormat, p.TargetField)
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	// Get the source field value.
 	val, err := event.GetValue("message")
 	if err != nil {
+		if p.IgnoreFailure || (p.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound) {
+			return event, nil
+		}
 		return event, errors.Wrap(err, "failed to get time from message field")
 	}
 
 	// Try to convert the value to a time.Time.
 	ts, err := p.tryToTime(val, event)
 	if err != nil {
+		if p.IgnoreFailure {
+			return event, nil
+		}
 		return event, err
 	}
 
 	// Put the timestamp as UTC into the target field.
 	_, err = event.PutValue(p.TargetField, ts.UTC())
 	if err != nil {
+		if p.IgnoreFailure {
+			return event, nil
+		}
 		return event, err
 	}
 
@@ -176,14 +185,14 @@ func (p *processor) parseTime(v interface{}) (string, error) {
 	if !ok {
 		return "", errors.Errorf("unexpected type %T for time field", v)
 	}
-	switch p.LogFormat {
-	case "json":
+	switch p.MessageFormat {
+	case "JSON":
 		var dat map[string]interface{}
 		if err := json.Unmarshal([]byte(timeStr), &dat); err != nil {
 			return timeStr, errors.Wrapf(err, "could not parse time field as int or float, message: %T", v)
 		}
 		timeStr = dat[p.JsonField].(string)
-	case "csv":
+	case "CSV":
 		csvFields := strings.Split(timeStr, p.CsvDelimiter)
 		timeStr = csvFields[p.CsvFieldPos]
 	}

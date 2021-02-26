@@ -19,7 +19,6 @@ package main
 
 import (
 	"os"
-	_ "github.com/raboof/beats-output-http/http"
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
 )
